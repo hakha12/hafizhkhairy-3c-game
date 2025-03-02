@@ -1,7 +1,10 @@
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour {
+	const float PLAYER_CLIMBING_FOV = 70;
+	const float PLAYER_STANDING_FOV = 40;
 	[SerializeField] private InputManager _input;
+	[SerializeField] private CameraManager _camera;
 	[SerializeField] private Transform _groundDetector;
 	[SerializeField] private LayerMask _groundLayer;
 	[SerializeField] private float _detectorRadius;
@@ -18,6 +21,7 @@ public class PlayerMovement : MonoBehaviour {
 	[SerializeField] private LayerMask _climbableLayer;
 	[SerializeField] private Vector3 _climbOffset;
 	[SerializeField] private float _climbSpeed;
+	[SerializeField] private Transform _cameraTransform;
 	private PlayerStance _playerStance;
 	private float _rotationSmoothVelocity;
 	private float _speed;
@@ -30,10 +34,12 @@ public class PlayerMovement : MonoBehaviour {
 		_input.OnSprintInput += Sprint;
 		_input.OnJumpInput += Jump;
 		_input.OnClimbInput += StartClimb;
-		_input.onCancelClimb += CancelClimb;
+		_input.OnCancelClimb += CancelClimb;
 	}
 
 	private void Awake(){
+		HideAndLockCursor();
+
 		_rigidbody = GetComponent<Rigidbody>();
 
 		_speed = _walkSpeed;
@@ -48,7 +54,7 @@ public class PlayerMovement : MonoBehaviour {
 		_input.OnSprintInput -= Sprint;
 		_input.OnJumpInput -= Jump;
 		_input.OnClimbInput -= StartClimb;
-		_input.onCancelClimb -= CancelClimb;
+		_input.OnCancelClimb -= CancelClimb;
 	}
 
 	private void CheckIsGrounded(){
@@ -60,13 +66,29 @@ public class PlayerMovement : MonoBehaviour {
 		bool isPlayerClimbing = _playerStance == PlayerStance.Climb;
 
 		if (isPlayerStanding){
-			if (axisDirection.magnitude < 0.1) return;
+			switch (_camera.cameraState){
+				case CameraState.FirstPerson:
+					transform.rotation = Quaternion.Euler(0f, _cameraTransform.eulerAngles.y, 0f);
 
-			float rotationAngle = Mathf.Atan2(axisDirection.x, axisDirection.y) * Mathf.Rad2Deg;
-			float smoothAngle = Mathf.SmoothDampAngle(transform.eulerAngles.y, rotationAngle, ref _rotationSmoothVelocity, _rotationSmoothTime);
-			transform.rotation =Quaternion.Euler(0f, smoothAngle, 0f);
+					Vector3 verticalDirection = axisDirection.y * transform.forward;
+					Vector3 horizontalDirection = axisDirection.x * transform.right;
 
-			movementDirection = Quaternion.Euler(0f, rotationAngle, 0f) * Vector3.forward;
+					movementDirection = verticalDirection + horizontalDirection;
+
+					break;
+				case CameraState.ThirdPerson:
+					if (axisDirection.magnitude < 0.1) return;
+
+					float rotationAngle = Mathf.Atan2(axisDirection.x, axisDirection.y) * Mathf.Rad2Deg + _cameraTransform.eulerAngles.y;
+					float smoothAngle = Mathf.SmoothDampAngle(transform.eulerAngles.y, rotationAngle, ref _rotationSmoothVelocity, _rotationSmoothTime);
+					transform.rotation =Quaternion.Euler(0f, smoothAngle, 0f);
+
+					movementDirection = Quaternion.Euler(0f, rotationAngle, 0f) * Vector3.forward;
+
+					break;
+				default:
+					break;
+			}
 
 			_rigidbody.AddForce(movementDirection * _speed * Time.deltaTime);
 
@@ -119,6 +141,9 @@ public class PlayerMovement : MonoBehaviour {
 		bool isNotClimbing = _playerStance != PlayerStance.Climb;
 
 		if (isInfrontofClimbingWall && _isGrounded && isNotClimbing){
+			_camera.SetFPSClampedCamera(true, transform.rotation.eulerAngles);
+			_camera.SetTPSFieldOfView(PLAYER_CLIMBING_FOV);
+
 			Vector3 offset = (transform.forward * _climbOffset.z) + (Vector3.up * _climbOffset.y);
 
 			transform.position = hit.point - offset;
@@ -130,8 +155,17 @@ public class PlayerMovement : MonoBehaviour {
 	private void CancelClimb(){
 		if (_playerStance == PlayerStance.Climb){
 			_playerStance = PlayerStance.Stand;
+
+			_camera.SetFPSClampedCamera(false, transform.rotation.eulerAngles);
+			_camera.SetTPSFieldOfView(PLAYER_STANDING_FOV);
+
 			_rigidbody.useGravity = true;
 			transform.position -= transform.forward * 1f;
 		}
+	}
+
+	private void HideAndLockCursor(){
+		Cursor.lockState = CursorLockMode.Locked;
+		Cursor.visible = false;
 	}
 }

@@ -7,7 +7,8 @@ public class InputManager : MonoBehaviour {
 	public Action<bool> OnSprintInput;
 	public Action OnJumpInput;
 	public Action OnClimbInput;
-	public Action onCancelClimb;
+	public Action OnCancelClimb;
+	public Action OnChangePOV;
 	private void Update(){
         CheckMovementInput();
 		CheckSprintInput();
@@ -77,6 +78,10 @@ public class InputManager : MonoBehaviour {
 		bool isPOVInputPressed = Input.GetKeyDown(KeyCode.Q);
 
 		if (isPOVInputPressed){
+			if (OnChangePOV == null) return;
+
+			OnChangePOV();
+
 			Debug.Log("POV Changed");
 		}
 	}
@@ -103,9 +108,9 @@ public class InputManager : MonoBehaviour {
 		bool isCancelInputPressed = Input.GetKeyDown(KeyCode.C);
 
 		if (isCancelInputPressed){
-			if (onCancelClimb == null) return;
+			if (OnCancelClimb == null) return;
 
-			onCancelClimb();
+			OnCancelClimb();
 			Debug.Log("Cancel jumping and climbing");
 		}
 	}

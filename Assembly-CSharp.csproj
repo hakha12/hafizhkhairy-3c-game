@@ -65,8 +65,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets/config/TutorialInfo/Scripts/Readme.cs" />
+    <Compile Include="Assets/game/Script/Camera/CameraManager.cs" />
     <Compile Include="Assets/game/Script/Player/PlayerMovement.cs" />
     <Compile Include="Assets/game/Script/Input/InputManager.cs" />
+    <Compile Include="Assets/game/Script/Camera/CameraState.cs" />
     <Compile Include="Assets/game/Script/Player/PlayerStance.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -906,6 +908,10 @@
       <HintPath>Library/ScriptAssemblies/Unity.Toolchain.Linux-x86_64.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="com.unity.cinemachine.editor">
+      <HintPath>Library/ScriptAssemblies/com.unity.cinemachine.editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.RenderPipelines.Universal.Runtime">
       <HintPath>Library/ScriptAssemblies/Unity.RenderPipelines.Universal.Runtime.dll</HintPath>
       <Private>False</Private>
@@ -1032,6 +1038,10 @@
     </Reference>
     <Reference Include="Unity.VSCode.Editor">
       <HintPath>Library/ScriptAssemblies/Unity.VSCode.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Cinemachine">
+      <HintPath>Library/ScriptAssemblies/Cinemachine.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.RenderPipelines.Universal.Editor">
