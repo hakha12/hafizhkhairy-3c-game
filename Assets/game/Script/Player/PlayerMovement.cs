@@ -6,6 +6,7 @@ public class PlayerMovement : MonoBehaviour {
 	const float PLAYER_STANDING_FOV = 40;
 	[SerializeField] private InputManager _input;
 	[SerializeField] private CameraManager _camera;
+	[SerializeField] private PlayerAudioManager _playerAudio;
 	[SerializeField] private Transform _groundDetector;
 	[SerializeField] private LayerMask _groundLayer;
 	[SerializeField] private float _detectorRadius;
@@ -245,6 +246,7 @@ public class PlayerMovement : MonoBehaviour {
 			_camera.SetFPSClampedCamera(true, transform.rotation.eulerAngles);
 			_playerStance = PlayerStance.Glide;
 			_animator.SetBool("IsGliding", true);
+			_playerAudio.PlayGlideSFX();
 		}
 	}
 
@@ -253,6 +255,7 @@ public class PlayerMovement : MonoBehaviour {
 			_camera.SetFPSClampedCamera(false, transform.rotation.eulerAngles);
 			_playerStance = PlayerStance.Stand;
 			_animator.SetBool("IsGliding", false);
+			_playerAudio.StopGlideSFX();
 		}
 	}
 
