@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 public class MainMenuManager : MonoBehaviour
 {
     public void Play(){
-		SceneManager.LoadScene("GameplayScene");
+		SceneManager.LoadScene("ForestScene");
 	}
 
 	public void Exit(){

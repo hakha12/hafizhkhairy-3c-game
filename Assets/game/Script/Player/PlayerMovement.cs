@@ -9,6 +9,7 @@ public class PlayerMovement : MonoBehaviour {
 	[SerializeField] private PlayerAudioManager _playerAudio;
 	[SerializeField] private Transform _groundDetector;
 	[SerializeField] private LayerMask _groundLayer;
+	[SerializeField] private Transform _resetCheckpointPos;
 	[SerializeField] private float _detectorRadius;
 	[SerializeField] private float _walkSpeed;
 	[SerializeField] private float _jumpForce;
@@ -98,6 +99,14 @@ public class PlayerMovement : MonoBehaviour {
 		if (_isGrounded){
 			CancelGlide();
 		}
+	}
+
+	public void ResetPositionToCheckpoint(){
+		if (_resetCheckpointPos != null)
+        {
+			transform.position = _resetCheckpointPos.position;
+			transform.rotation = _resetCheckpointPos.rotation;
+        }
 	}
 	private void Move(Vector2 axisDirection){
 		Vector3 movementDirection = Vector3.zero;
